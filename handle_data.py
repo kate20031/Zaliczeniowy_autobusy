@@ -1,24 +1,28 @@
-from ast import literal_eval
+import csv
+from datetime import datetime
+from itertools import groupby
 
-import pandas as pd
+
+def convert_to_dict(str_dict):
+    return eval(str_dict)
 
 
-def read_and_group_by_vehicle_number():
-    df = pd.read_csv('output.csv')
-    df['result'] = df['result'].apply(lambda data: literal_eval(data))
-    all_data_df = []
+csv_file_path = "output.csv"
+json_data = []
 
-    for item in df['result']:
-        temp_data = pd.DataFrame(item)
-        all_data_df.append(temp_data)
+with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
+    csv_reader = csv.reader(csvfile, delimiter=',')
 
-    all_data_df = pd.concat(all_data_df)
+    next(csv_reader, None)
+    for row in csv_reader:
+        data_str = row[0]
+        data_dict = convert_to_dict(data_str)
+        time_str = data_dict['Time']
+        d = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
 
-    if 'VehicleNumber' in all_data_df.columns:
-        group_data = all_data_df.groupby('VehicleNumber')
+        if d.hour == 19 and d.day:
+            json_data.append(data_dict)
 
-        for name, group in group_data:
-            print(name)
-            print(group)
+sorted_json_data = sorted(json_data, key=lambda x: x['VehicleNumber'])
 
-read_and_group_by_vehicle_number()
+grouped_json_data = {key: list(group) for key, group in groupby(sorted_json_data, key=lambda x: x['VehicleNumber'])}
