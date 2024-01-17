@@ -1,6 +1,20 @@
 import csv
+from cmath import acos, sin, cos, sqrt, asin
 from datetime import datetime
 from itertools import groupby
+from math import radians
+
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    distance = 6371 * c * 1000
+
+    return int(distance.real)
 
 
 def convert_to_dict(str_dict):
@@ -23,6 +37,6 @@ with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
         if d.hour == 19 and d.day:
             json_data.append(data_dict)
 
-sorted_json_data = sorted(json_data, key=lambda x: x['VehicleNumber'])
-
+sorted_json_data = sorted(json_data, key=lambda x: (x['VehicleNumber'], x['Time']))
 grouped_json_data = {key: list(group) for key, group in groupby(sorted_json_data, key=lambda x: x['VehicleNumber'])}
+
