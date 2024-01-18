@@ -108,4 +108,4 @@ print(find_max_speed(json2))
 violations_coordinates = []
 
 max_distance = 50
-find_violations_places(violations_coordinates)
+find_violations_places(violations_coordinates, max_distance)
