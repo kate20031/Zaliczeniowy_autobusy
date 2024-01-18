@@ -3,6 +3,8 @@ from cmath import acos, sin, cos, sqrt, asin
 from datetime import datetime
 from itertools import groupby
 from math import radians
+from sklearn.cluster import DBSCAN
+
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -74,6 +76,26 @@ def find_max_speed(json_data):
     count_grater_than_50 = sum(1 for speed in max_speeds if speed > 50)
     return count_grater_than_50
 
+def find_violations_places(coordinates, max_distance):
+    clusters = []
+    current_cluster = [coordinates[0]]
+
+    for i in range(1, len(coordinates)):
+        lat, lon = coordinates[i]
+        prev_lat, prev_lon = current_cluster[-1]
+
+        distance = haversine_distance(prev_lat, prev_lon, lat, lon)
+
+        if distance <= max_distance:
+            current_cluster.append((lat, lon))
+        else:
+            clusters.append(current_cluster)
+            current_cluster = [(lat, lon)]
+
+    clusters.append(current_cluster)
+
+    return clusters
+
 bus_csv1_file_path = "bus_output1.csv"
 bus_csv2_file_path = "bus_output2.csv"
 
@@ -82,3 +104,8 @@ json2 = format_and_data(bus_csv2_file_path)
 
 print(find_max_speed(json1))
 print(find_max_speed(json2))
+
+violations_coordinates = []
+
+max_distance = 50
+find_violations_places(violations_coordinates)
