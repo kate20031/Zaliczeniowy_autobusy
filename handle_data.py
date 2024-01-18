@@ -21,10 +21,8 @@ def convert_to_dict(str_dict):
     return eval(str_dict)
 
 
-def calculate_average_speed(group):
-    total_distance = 0
-    total_time = 0
-    sum_speed = 0
+def calculate_max_speed(group):
+    max_speed = 0
 
     for i in range(1, len(group)):
         time_diff = (datetime.strptime(group[i]['Time'], '%Y-%m-%d %H:%M:%S') -
@@ -33,34 +31,54 @@ def calculate_average_speed(group):
         lat1, lon1 = group[i - 1]['Lat'], group[i - 1]['Lon']
         lat2, lon2 = group[i]['Lat'], group[i]['Lon']
         distance = haversine_distance(lat1, lon1, lat2, lon2)
-        total_distance += distance
-        total_time += time_diff
-
-    average_speed = total_distance / total_time * 3.6 if total_time > 0 else 0
-    print(average_speed)
-
-    return average_speed
+        speed = distance / time_diff * 3.6 if time_diff > 0 else 0
+        if speed > max_speed:
+            max_speed = speed
+    return max_speed
 
 
-csv_file_path = "output.csv"
-json_data = []
+def format_and_data(file_path):
+    json_data = []
 
-with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
-    csv_reader = csv.reader(csvfile, delimiter=',')
+    with open(file_path, newline='', encoding='utf-8') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=',')
 
-    next(csv_reader, None)
-    for row in csv_reader:
-        data_str = row[0]
-        data_dict = convert_to_dict(data_str)
-        time_str = data_dict['Time']
-        d = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+        next(csv_reader, None)
+        for row in csv_reader:
+            data_str = row[0]
+            data_dict = convert_to_dict(data_str)
+            time_str = data_dict['Time']
+            try:
+                d = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                continue
 
-        if d.hour == 19 and d.day:
-            json_data.append(data_dict)
+            if file_path == 'bas_output1.csv' or d.hour == 11 or d.hour == 12 and d.day:
+                json_data.append(data_dict)
+            elif file_path == 'bas_output2.csv' or d.hour == 17 or d.hour == 18 and d.day:
+                json_data.append(data_dict)
 
-sorted_json_data = sorted(json_data, key=lambda x: (x['VehicleNumber'], x['Time']))
-grouped_json_data = {key: list(group) for key, group in groupby(sorted_json_data, key=lambda x: x['VehicleNumber'])}
+    sorted_json_data = sorted(json_data, key=lambda x: (x['VehicleNumber'], x['Time']))
+    grouped_json_data = {key: list(group) for key, group in groupby(sorted_json_data, key=lambda x: x['VehicleNumber'])}
 
-for key, group in grouped_json_data.items():
-    avg_speed = calculate_average_speed(group)
-    print(f"VehicleNumber {key}: Average Speed = {avg_speed:.2f} meters per second")
+    return grouped_json_data
+
+def find_max_speed(json_data):
+    max_speeds = []
+
+    for key, group in json_data.items():
+        max_sp = calculate_max_speed(group)
+        # print(max_sp)
+        max_speeds.append(max_sp)
+
+    count_grater_than_50 = sum(1 for speed in max_speeds if speed > 50)
+    return count_grater_than_50
+
+bus_csv1_file_path = "bus_output1.csv"
+bus_csv2_file_path = "bus_output2.csv"
+
+json1 = format_and_data(bus_csv1_file_path)
+json2 = format_and_data(bus_csv2_file_path)
+
+print(find_max_speed(json1))
+print(find_max_speed(json2))
