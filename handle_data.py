@@ -22,22 +22,37 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 def convert_to_dict(str_dict):
     return eval(str_dict)
 
+def calculate_speed(group, id):
+    time_diff = (datetime.strptime(group[id]['Time'], '%Y-%m-%d %H:%M:%S') -
+                         datetime.strptime(group[id - 1]['Time'], '%Y-%m-%d %H:%M:%S')).total_seconds()
+
+    lat1, lon1 = group[id - 1]['Lat'], group[id - 1]['Lon']
+    lat2, lon2 = group[id]['Lat'], group[id]['Lon']
+    distance = haversine_distance(lat1, lon1, lat2, lon2)
+    speed = distance / time_diff * 3.6 if time_diff > 0 else 0
+
+    return speed
 
 def calculate_max_speed(group):
     max_speed = 0
 
     for i in range(1, len(group)):
-        time_diff = (datetime.strptime(group[i]['Time'], '%Y-%m-%d %H:%M:%S') -
-                     datetime.strptime(group[i - 1]['Time'], '%Y-%m-%d %H:%M:%S')).total_seconds()
-
-        lat1, lon1 = group[i - 1]['Lat'], group[i - 1]['Lon']
-        lat2, lon2 = group[i]['Lat'], group[i]['Lon']
-        distance = haversine_distance(lat1, lon1, lat2, lon2)
-        speed = distance / time_diff * 3.6 if time_diff > 0 else 0
+        speed = calculate_speed(group, i)
         if speed > max_speed:
             max_speed = speed
     return max_speed
 
+
+def merge_coordinates_and_speeds(group):
+    coordinates_speeds = []
+
+    for i in range(1, len(group)):
+        speed = calculate_speed(group, i)
+        lat = group[i].get('Lat')
+        lon = group[i].get('Lon')
+        coordinates_speeds.append((lat, lon, speed))
+
+    return coordinates_speeds
 
 def format_and_data(file_path):
     json_data = []
