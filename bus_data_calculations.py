@@ -1,25 +1,8 @@
 import csv
-from cmath import sin, cos, sqrt, asin
 from datetime import datetime
 from itertools import groupby
-from math import radians
 from constants import *
-
-
-def haversine_distance(lat1, lon1, lat2, lon2):
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * asin(sqrt(a))
-    distance = EARTH_RADIUS * c * KM_TO_M_CONVERSION
-
-    return int(distance.real)
-
-
-def convert_to_dict(str_dict):
-    return eval(str_dict)
+from utils import *
 
 
 def calculate_speed(group, id):
@@ -87,7 +70,7 @@ def format_and_data(file_path):
     return grouped_json_data
 
 
-def find_max_speed(json_data, max_allowed_speed):
+def count_vehicles_over_speed_limit(json_data, max_allowed_speed):
     max_speeds = []
 
     for key, group in json_data.items():
@@ -119,21 +102,3 @@ def find_violations_places(coordinates, max_dist, bus_count):
             result.append(cluster)
 
     return result
-
-
-json1 = format_and_data(BUS_OUTPUT1_FILE)
-json2 = format_and_data(BUS_OUTPUT2_FILE)
-
-bus_count_data1 = len(json1.items())
-bus_count_data2 = len(json2.items())
-
-
-print(find_max_speed(json1, MAX_SPEED))
-print(find_max_speed(json2, MAX_SPEED))
-
-violations = get_violation_coordinates(json1, MAX_SPEED)
-# print(len(violations))
-print(len(find_violations_places(violations, MAX_DISTANCE, bus_count_data1)))
-#
-violations = get_violation_coordinates(json2, MAX_SPEED)
-print(len(find_violations_places(violations, MAX_DISTANCE, bus_count_data2)))
