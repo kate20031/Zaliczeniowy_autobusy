@@ -32,7 +32,9 @@ def load_data():
         if current_time.hour in run_hours1:
             output_file_path = 'bus_output1.csv'
         elif current_time.hour in run_hours2:
-            output_file_path = 'bus_output2.csv'
+            output_file_path = ('bus_output2.cs'
+                                ''
+                                '+v')
 
         if records != "Błędna metoda lub parametry wywołania":
             with open(output_file_path, 'a', newline='') as file:
