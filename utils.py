@@ -1,17 +1,22 @@
 import csv
-from constants import *
+
+import requests
+
+from config.constants import *
 from cmath import sin, cos, sqrt, asin
 from math import radians
 
+
 def process_data(response, output_file_path):
     data = response.json()
-    records = data['result']
+    records = data["result"]
 
     if records != "Błędna metoda lub parametry wywołania":
-        with open(output_file_path, 'a', newline='') as file:
+        with open(output_file_path, "a", newline="") as file:
             writer = csv.writer(file)
             for record in records:
                 writer.writerow([record])
+
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
@@ -27,3 +32,15 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 def convert_to_dict(str_dict):
     return eval(str_dict)
+
+def conect_to_api(query_params):
+    r = requests.get(
+        "https://api.um.warszawa.pl/api/action/dbtimetable_get/",
+        params=query_params,
+        timeout=5,
+    )
+
+    data = r.json()
+    records = data["result"]
+
+    return records
