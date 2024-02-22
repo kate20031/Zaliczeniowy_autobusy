@@ -2,8 +2,8 @@
 This module loads the bus timetable data.
 """
 
-from config.constants import API_KEY
-from utils import conect_to_api
+from BusTracker.config.constants import API_KEY
+from BusTracker.utils import conect_to_api
 
 
 def load_bus_timetable_data(bus_stop_id, bus_stop_nr, line):

@@ -5,17 +5,15 @@ over the speed limit and the count of violations in vicinity.
 """
 import pandas as pd
 
-from config.constants import (
+from BusTracker.config.constants import (
     BUS_OUT1_FILE,
     BUS_OUT2_FILE,
     STOPS_COORD_FILE,
-    # ACCURACY_FILE1,
-    # ACCURACY_FILE2,
     PUNCTUAL_BUSES_FILE1,
     PUNCTUAL_BUSES_FILE2,
 )
-from config.constants import MAX_SPEED, MAX_DISTANCE
-from src.bus_data_calculations import (
+from BusTracker.config.constants import MAX_SPEED, MAX_DISTANCE
+from BusTracker.src.bus_data_calculations import (
     get_bus_data,
     get_data,
     count_vehicles_over_speed_limit,
@@ -78,5 +76,12 @@ def print_punctuality_accuracy():
     df1 = pd.read_csv(PUNCTUAL_BUSES_FILE1)
     df2 = pd.read_csv(PUNCTUAL_BUSES_FILE2)
 
-    print(f"Number of punctual buses during rush hours: {len(df1)}")
-    print(f"Number of punctual buses during non rush hours: {len(df2)}")
+    non_puct_rush_count = df1.groupby(
+        ["Zespol", "Slupek", "Lines"]).size().shape[0]
+    non_puct_nrush_count = df2.groupby(
+        ["Zespol", "Slupek", "Lines"]).size().shape[0]
+
+    print(
+        f"Number of non punctual buses during non rush hours: {non_puct_nrush_count}")
+    print(
+        f"Number of non punctual buses during rush hours: {non_puct_rush_count}")

@@ -7,7 +7,8 @@ from datetime import datetime
 
 import pandas as pd
 import requests
-from config.constants import (
+
+from BusTracker.config.constants import (
     BUS_TRACKER_API_RESOURCE_ID,
     API_KEY,
     BUS_TRACKER_API_URL,
@@ -19,7 +20,7 @@ from config.constants import (
     DATE_FORMAT,
 )
 
-from utils import process_data, conect_to_api
+from BusTracker.utils import process_data, conect_to_api
 
 
 def load_bus_tracking_data():

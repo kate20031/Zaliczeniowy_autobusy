@@ -2,9 +2,10 @@ import csv
 
 import requests
 
-from config.constants import *
 from cmath import sin, cos, sqrt, asin
 from math import radians
+
+from BusTracker.config.constants import KM_TO_M_CONVERSION, EARTH_RADIUS
 
 
 def process_data(response, output_file_path):

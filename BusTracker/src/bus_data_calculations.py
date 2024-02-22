@@ -10,17 +10,18 @@ from itertools import groupby
 from datetime import datetime
 import pandas as pd
 
-from data_loaders.bus_data_loader import load_data, load_timetable_data
-from utils import convert_to_dict, haversine_distance
-from config.constants import (
+from BusTracker.data_loaders.bus_data_loader import load_data, load_timetable_data
+from BusTracker.utils import convert_to_dict, haversine_distance
+from BusTracker.config.constants import (
     SPEED_CONVERSION,
     DATE_FORMAT,
     CSV_DELIMITER,
     TIME_FORMAT,
     MAX_TIME_DIFF,
+    MIN_TIME_DIFF,
 )
-from config.constants import EARLY_HOURS, LATE_HOURS, BUS_COUNT_THRESHOLD
-from config.constants import BUS_OUT2_FILE, BUS_OUT1_FILE, CSV_ENCODING
+from BusTracker.config.constants import EARLY_HOURS, LATE_HOURS, BUS_COUNT_THRESHOLD
+from BusTracker.config.constants import BUS_OUT2_FILE, BUS_OUT1_FILE, CSV_ENCODING
 
 
 def calculate_speed(vehicle, index):
@@ -326,7 +327,7 @@ def check_punctuality_accuracy(accuracy_csv, punctual_buses_csv):
             for timetable_time in timetable_times:
                 time_diff = calculate_time_diff(timetable_time, real_time)
 
-                if time_diff <= MAX_TIME_DIFF:
+                if MIN_TIME_DIFF < time_diff < MAX_TIME_DIFF:
                     results_df = results_df.append(
                         {
                             "Zespol": zespol,

@@ -28,8 +28,8 @@ def analyse_data():
     Calls functions to print vehicles over
      speed limit and violations in vicinity.
     """
-    # print_vehicles_over_speed_limit()
-    # print_violations_in_vicinity()
+    print_vehicles_over_speed_limit()
+    print_violations_in_vicinity()
     print_punctuality_accuracy()
 
 
